@@ -5,17 +5,19 @@
 #ifndef RAY_TRACING_SPHERE_H
 #define RAY_TRACING_SPHERE_H
 
+#include <utility>
+
 #include "vec3.h"
 #include "hittable.h"
-
+class material;
 class sphere : public hittable {
 public:
     point3 center;
     double radius;
+    shared_ptr<material> mat_ptr;
 
     sphere() = default;
-
-    sphere(point3 c, double r) : center(c), radius(r) {};
+    sphere(point3 c, double r, shared_ptr<material> m) : center(c), radius(r), mat_ptr(std::move(m)) {};
 
     bool hit(
             const ray &r, double t_min, double t_max, hit_record &rec
@@ -43,6 +45,7 @@ bool sphere::hit(const ray &r, double t_min, double t_max, hit_record& rec) cons
     rec.p = r.at(rec.t);
     vec3 outward_normal = (rec.p - center) / radius;
     rec.set_face_normal(r, outward_normal);
+    rec.mat_ptr = mat_ptr;
     return true;
 }
 
